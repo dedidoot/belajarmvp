@@ -1,0 +1,112 @@
+package com.mvp.mvp;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+
+import com.mvp.mvp.helper.Utils;
+import com.mvp.mvp.model.api.RequestInterface;
+import com.mvp.mvp.model.api.RestClient;
+import com.mvp.mvp.model.pojo.Rintik;
+import com.mvp.mvp.model.pojo.User;
+import com.mvp.mvp.view.LoadMoreRecycler;
+import com.mvp.mvp.view.adapter.ActivitesUser;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
+public class MainActivity extends AppCompatActivity implements LoadMoreRecycler.OnLoadMoreListener {
+
+    private ActivitesUser adapterUser;
+    private List<User> datausers = new ArrayList<>();
+    private int batas = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        RecyclerView recycler_view = (RecyclerView) findViewById(R.id.recycler_view);
+
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
+        //LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+        //layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+
+        if (recycler_view != null) {
+            recycler_view.setLayoutManager(gridLayoutManager);
+        }
+
+        //recycler_view.setLayoutManager(layoutManager);
+
+        adapterUser = new ActivitesUser(recycler_view, datausers, this, gridLayoutManager, null);
+        //adapterUser = new ActivitesUser(recycler_view, datausers, this, null, layoutManager);
+
+        if (recycler_view != null) {
+            recycler_view.setAdapter(adapterUser);
+        }
+
+
+        getDataAct("0");
+
+    }
+
+    private void getDataAct(final String pagination) {
+        final RequestInterface request = RestClient.createService(RequestInterface.class);
+        request.rintik()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Rintik>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.wtf("onCompleted", "=> ");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.wtf("onError", "=> " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Rintik rintik) {
+                        String key = Utils.md5("u_act" + rintik.waktunya);
+                        request.getUserActivities(key, rintik.waktunya, "0", pagination)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Observer<List<User>>() {
+                                    @Override
+                                    public void onCompleted() {
+                                        adapterUser.stopLoading();
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+
+                                    }
+
+                                    @Override
+                                    public void onNext(List<User> user) {
+                                        if (user.size() < 15) {
+                                            adapterUser.setEnableLoadMore(false);
+                                        }
+                                        adapterUser.addItems(user);
+                                    }
+                                });
+                    }
+                });
+    }
+
+    @Override
+    public void onLoadMore() {
+        Log.wtf("load more", "on the way");
+        batas = batas + 15;
+        getDataAct(batas + "");
+    }
+}
