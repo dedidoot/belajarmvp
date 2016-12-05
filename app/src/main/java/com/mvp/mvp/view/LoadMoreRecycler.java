@@ -38,69 +38,71 @@ public abstract class LoadMoreRecycler<T> extends RecyclerView.Adapter<RecyclerV
 
     public LoadMoreRecycler(final RecyclerView recyclerView, List<T> dataSet,
                             final OnLoadMoreListener onLoadMoreListener,
-                            final GridLayoutManager grid, LinearLayoutManager linear) {
+                            final GridLayoutManager grid, final LinearLayoutManager linear) {
 
         this.dataSet = dataSet;
 
-        if (recyclerView.getLayoutManager() instanceof LinearLayoutManager && linear != null) {
-
-            linearLayoutManager = linear;
-
-            final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recycler, int dx, int dy) {
-                    if (!enableLoadMore) return;
-
-                    totalItemCount = linearLayoutManager.getItemCount();
-                    visibleItemCount = linearLayoutManager.getChildCount();
-                    firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
-
-                    if (loading && (totalItemCount - visibleItemCount)
-                            <= (firstVisibleItem + VISIBLE_THRESHOLD)) {
-                        addItem(null);
-                        if (onLoadMoreListener != null) {
-                            onLoadMoreListener.onLoadMore();
-                        }
-                        loading = false;
-                    }
-                }
-            });
-        } else if (recyclerView.getLayoutManager() instanceof LinearLayoutManager && grid != null) {
-
-            gridLayoutManager = grid;
-
-            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {/** ## basically getSpanSize return default 1 (selain 1 baklan crash) if item ## **/
-                    if (getItemViewType(position) == ITEM_VIEW_TYPE_FOOTER) {
-                        return ITEM_VIEW_TYPE_FOOTER;
-                    } else {
-                        return ITEM_VIEW_TYPE_BASIC;
-                    }
-
-                }
-            });
+        if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
 
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(RecyclerView recycler, int dx, int dy) {
-                    if (!enableLoadMore) return;
 
-                    visibleItemCount = gridLayoutManager.getChildCount();
-                    totalItemCount = gridLayoutManager.getItemCount();
-                    firstVisibleItem = gridLayoutManager.findFirstVisibleItemPosition();
-                    boolean isLoad = (visibleItemCount + firstVisibleItem) == totalItemCount;
+                    if (!enableLoadMore) {
+                        return;
+                    }
 
-                    if (loading && isLoad) {
-                        addItem(null);
-                        if (onLoadMoreListener != null) {
-                            onLoadMoreListener.onLoadMore();
+                    if (linear != null) {/* jika recycler view pakai linear layout manager */
+
+                        linearLayoutManager = linear;
+
+                        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+                        totalItemCount = linearLayoutManager.getItemCount();
+                        visibleItemCount = linearLayoutManager.getChildCount();
+                        firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+
+                        if (loading && (totalItemCount - visibleItemCount)
+                                <= (firstVisibleItem + VISIBLE_THRESHOLD)) {
+                            addItem(null);
+                            if (onLoadMoreListener != null) {
+                                onLoadMoreListener.onLoadMore();
+                            }
+                            loading = false;
                         }
-                        loading = false;
+                    } else if (grid != null) {/* jika recycler view pakai grid layout manager */
+
+                        gridLayoutManager = grid;
+
+                        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                            @Override
+                            public int getSpanSize(int position) {/** ## basically getSpanSize return default 1 (selain 1 baklan crash) **/
+                                if (getItemViewType(position) == ITEM_VIEW_TYPE_FOOTER) {
+                                    return ITEM_VIEW_TYPE_FOOTER;
+                                } else {
+                                    return ITEM_VIEW_TYPE_BASIC;
+                                }
+
+                            }
+                        });
+
+                        visibleItemCount = gridLayoutManager.getChildCount();
+                        totalItemCount = gridLayoutManager.getItemCount();
+                        firstVisibleItem = gridLayoutManager.findFirstVisibleItemPosition();
+                        boolean isLoad = (visibleItemCount + firstVisibleItem) == totalItemCount;
+
+                        if (loading && isLoad) {
+                            addItem(null);
+                            if (onLoadMoreListener != null) {
+                                onLoadMoreListener.onLoadMore();
+                            }
+                            loading = false;
+                        }
+
                     }
                 }
             });
+
         }
     }
 
