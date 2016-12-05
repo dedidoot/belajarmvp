@@ -11,6 +11,7 @@ import com.mvp.mvp.helper.Utils;
 import com.mvp.mvp.model.api.RequestInterface;
 import com.mvp.mvp.model.api.RestClient;
 import com.mvp.mvp.model.pojo.Rintik;
+import com.mvp.mvp.model.pojo.ShowHeaderUser;
 import com.mvp.mvp.model.pojo.User;
 import com.mvp.mvp.view.LoadMoreRecycler;
 import com.mvp.mvp.view.adapter.ActivitesUser;
@@ -36,23 +37,24 @@ public class MainActivity extends AppCompatActivity implements LoadMoreRecycler.
         RecyclerView recycler_view = (RecyclerView) findViewById(R.id.recycler_view);
 
 
-        //GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
         LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
 
         if (recycler_view != null) {
-            //recycler_view.setLayoutManager(gridLayoutManager);
-            recycler_view.setLayoutManager(layoutManager);
+            recycler_view.setLayoutManager(gridLayoutManager);
+            //recycler_view.setLayoutManager(layoutManager);
         }
 
+        datausers.add(new ShowHeaderUser());
 
-
-        //adapterUser = new ActivitesUser(recycler_view, datausers, this, gridLayoutManager, null);
-        adapterUser = new ActivitesUser(recycler_view, datausers, this, null, layoutManager);
+        adapterUser = new ActivitesUser(recycler_view, datausers, this, gridLayoutManager, null);
+        //adapterUser = new ActivitesUser(recycler_view, datausers, this, null, layoutManager);
 
         if (recycler_view != null) {
             recycler_view.setAdapter(adapterUser);
+
         }
 
 

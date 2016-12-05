@@ -10,4 +10,5 @@ public class User {
     public String username_user;
     public String fullname_user;
     public String activity;
+
 }
