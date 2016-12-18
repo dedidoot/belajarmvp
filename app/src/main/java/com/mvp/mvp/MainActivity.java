@@ -7,6 +7,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mvp.mvp.helper.Utils;
 import com.mvp.mvp.model.api.RequestInterface;
 import com.mvp.mvp.model.api.RestClient;
@@ -25,13 +27,18 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements LoadMoreRecycler.OnLoadMoreListener {
 
-    private ActivitesUser adapterUser;
+    public ActivitesUser adapterUser;
     private List<User> datausers = new ArrayList<>();
     private int batas = 0;
+    public static MainActivity mainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        mainActivity = this;
+
         setContentView(R.layout.activity_main);
 
         RecyclerView recycler_view = (RecyclerView) findViewById(R.id.recycler_view);
@@ -97,6 +104,12 @@ public class MainActivity extends AppCompatActivity implements LoadMoreRecycler.
 
                                     @Override
                                     public void onNext(List<User> user) {
+
+                                        /* konversi dari pojo to json string */
+                                        Gson gson = new GsonBuilder().create();
+                                        String json = gson.toJson(user);
+                                        Utils.LogNp("data", "=> " + json);
+
                                         if (user.size() < 15) {
                                             adapterUser.setEnableLoadMore(false);
                                         }
