@@ -8,11 +8,11 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mvp.mvp.MainActivity;
 import com.mvp.mvp.R;
+import com.mvp.mvp.coolapsing.ScrollingActivity;
 import com.mvp.mvp.model.pojo.User;
 
 
@@ -69,7 +69,11 @@ public class ContentActivities extends FrameLayout {
                     viewHolderUser.img.setImageResource(R.mipmap.user);
                     user.is_checked = true;
                 }
-                MainActivity.mainActivity.adapterUser.notifyDataSetChanged();
+                if (MainActivity.mainActivity != null) {
+                    MainActivity.mainActivity.adapterUser.notifyDataSetChanged();
+                } else if (ScrollingActivity.mainActivity != null) {
+                    ScrollingActivity.mainActivity.adapterUser.notifyDataSetChanged();
+                }
             }
         });
     }
