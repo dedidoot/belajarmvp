@@ -9,12 +9,14 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.mvp.mvp.R;
+import com.mvp.mvp.model.pojo.ShowHeaderUser;
 
 import java.util.List;
 
@@ -27,14 +29,13 @@ public abstract class LoadMoreRecycler<T> extends RecyclerView.Adapter<RecyclerV
 
     private final int ITEM_VIEW_TYPE_BASIC = 1;
     private final int ITEM_VIEW_TYPE_FOOTER = 2;
+    private final int ITEM_VIEW_TYPE_HEADER = 0;
 
     private List<T> dataSet;
 
     private int firstVisibleItem, visibleItemCount, totalItemCount, previousTotal = 0;
     private boolean loading = true;
     private boolean enableLoadMore = true;
-    public GridLayoutManager gridLayoutManager;
-    public LinearLayoutManager linearLayoutManager;
 
     public LoadMoreRecycler(final RecyclerView recyclerView, List<T> dataSet,
                             final OnLoadMoreListener onLoadMoreListener,
@@ -43,6 +44,26 @@ public abstract class LoadMoreRecycler<T> extends RecyclerView.Adapter<RecyclerV
         this.dataSet = dataSet;
 
         if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
+
+            if (grid != null) {
+                grid.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                    @Override
+                    public int getSpanSize(int position) {
+
+                        /** pada dasarnya getSpanSize returnnya default 1 (selain 1 or spanCount baklan crash)
+                         *  dan selalu diingat return ini juga berdasarkan {@link GridLayoutManager#setSpanCount(int)} **/
+
+                        if (getItemViewType(position) == ITEM_VIEW_TYPE_HEADER) {
+                            return 2;
+                        } else if (getItemViewType(position) == ITEM_VIEW_TYPE_FOOTER) {
+                            return 2;
+                        } else {
+                            return 1;
+                        }
+
+                    }
+                });
+            }
 
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
@@ -54,13 +75,9 @@ public abstract class LoadMoreRecycler<T> extends RecyclerView.Adapter<RecyclerV
 
                     if (linear != null) {/* jika recycler view pakai linear layout manager */
 
-                        linearLayoutManager = linear;
-
-                        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-
-                        totalItemCount = linearLayoutManager.getItemCount();
-                        visibleItemCount = linearLayoutManager.getChildCount();
-                        firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+                        totalItemCount = linear.getItemCount();
+                        visibleItemCount = linear.getChildCount();
+                        firstVisibleItem = linear.findFirstVisibleItemPosition();
 
                         if (loading && (totalItemCount - visibleItemCount)
                                 <= (firstVisibleItem + VISIBLE_THRESHOLD)) {
@@ -70,25 +87,12 @@ public abstract class LoadMoreRecycler<T> extends RecyclerView.Adapter<RecyclerV
                             }
                             loading = false;
                         }
+
                     } else if (grid != null) {/* jika recycler view pakai grid layout manager */
 
-                        gridLayoutManager = grid;
-
-                        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                            @Override
-                            public int getSpanSize(int position) {/** ## basically getSpanSize return default 1 (selain 1 baklan crash) **/
-                                if (getItemViewType(position) == ITEM_VIEW_TYPE_FOOTER) {
-                                    return ITEM_VIEW_TYPE_FOOTER;
-                                } else {
-                                    return ITEM_VIEW_TYPE_BASIC;
-                                }
-
-                            }
-                        });
-
-                        visibleItemCount = gridLayoutManager.getChildCount();
-                        totalItemCount = gridLayoutManager.getItemCount();
-                        firstVisibleItem = gridLayoutManager.findFirstVisibleItemPosition();
+                        visibleItemCount = grid.getChildCount();
+                        totalItemCount = grid.getItemCount();
+                        firstVisibleItem = grid.findFirstVisibleItemPosition();
                         boolean isLoad = (visibleItemCount + firstVisibleItem) == totalItemCount;
 
                         if (loading && isLoad) {
@@ -173,7 +177,16 @@ public abstract class LoadMoreRecycler<T> extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public int getItemViewType(int position) {
-        return dataSet.get(position) != null ? ITEM_VIEW_TYPE_BASIC : ITEM_VIEW_TYPE_FOOTER;
+
+        if (dataSet.get(position) instanceof ShowHeaderUser) {
+            return ITEM_VIEW_TYPE_HEADER;
+        } else if (dataSet.get(position) != null) {
+            return ITEM_VIEW_TYPE_BASIC;
+        } else if (dataSet.get(position) == null) {
+            return ITEM_VIEW_TYPE_FOOTER;
+        } else {
+            return 99;
+        }
     }
 
     @Override
@@ -183,7 +196,10 @@ public abstract class LoadMoreRecycler<T> extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == ITEM_VIEW_TYPE_BASIC) {
+
+        if (viewType == ITEM_VIEW_TYPE_HEADER) {
+            return onCreateHeaderViewHolder(parent, viewType);
+        } else if (viewType == ITEM_VIEW_TYPE_BASIC) {
             return onCreateBasicItemViewHolder(parent, viewType);
         } else if (viewType == ITEM_VIEW_TYPE_FOOTER) {
             return onCreateFooterViewHolder(parent, viewType);
@@ -194,16 +210,23 @@ public abstract class LoadMoreRecycler<T> extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder genericHolder, int position) {
-        if (getItemViewType(position) == ITEM_VIEW_TYPE_BASIC) {
+
+        if (getItemViewType(position) == ITEM_VIEW_TYPE_HEADER) {
+            onBindHeaderItemView(genericHolder, position);
+        } else if (getItemViewType(position) == ITEM_VIEW_TYPE_BASIC) {
             onBindBasicItemView(genericHolder, position);
-        } else {
+        } else if (getItemViewType(position) == ITEM_VIEW_TYPE_FOOTER) {
             onBindFooterView(genericHolder, position);
         }
     }
 
+    public abstract RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent, int viewType);
+
     public abstract RecyclerView.ViewHolder onCreateBasicItemViewHolder(ViewGroup parent, int viewType);
 
     public abstract void onBindBasicItemView(RecyclerView.ViewHolder genericHolder, int position);
+
+    public abstract void onBindHeaderItemView(RecyclerView.ViewHolder genericHolder, int position);
 
     public RecyclerView.ViewHolder onCreateFooterViewHolder(ViewGroup parent, int viewType) {
         //noinspection ConstantConditions

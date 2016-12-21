@@ -1,5 +1,7 @@
 package com.mvp.mvp.helper;
 
+import android.util.Log;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -31,5 +33,22 @@ public class Utils {
         }
 
         return hex.toString();
+    }
+
+    public static void LogNp(String log1, String log2) {
+        if (log2.length() > 500) {
+            try {
+                int maxLogSize = 500;
+                for (int i = 0; i <= log2.length() / maxLogSize; i++) {
+                    int start = i * maxLogSize;
+                    int end = (i + 1) * maxLogSize;
+                    end = end > log2.length() ? log2.length() : end;
+                    Log.e(log1, log2.substring(start, end));
+                }
+            } catch (Exception e) {
+            }
+        } else {
+            Log.e(log1, log2);
+        }
     }
 }

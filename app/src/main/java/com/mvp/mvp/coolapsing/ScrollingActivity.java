@@ -1,7 +1,11 @@
-package com.mvp.mvp;
+package com.mvp.mvp.coolapsing;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.AppCompatActivity;
+
+import com.mvp.mvp.R;
+
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,12 +29,12 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements LoadMoreRecycler.OnLoadMoreListener {
+public class ScrollingActivity extends AppCompatActivity implements LoadMoreRecycler.OnLoadMoreListener {
 
     public ActivitesUser adapterUser;
     private List<User> datausers = new ArrayList<>();
     private int batas = 0;
-    public static MainActivity mainActivity;
+    public static ScrollingActivity mainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +43,17 @@ public class MainActivity extends AppCompatActivity implements LoadMoreRecycler.
 
         mainActivity = this;
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_scrolling2);
+
+        CollapsingToolbarLayout toolbar_layout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        toolbar_layout.setTitleEnabled(true);
+        toolbar_layout.setTitle("Title");
 
         RecyclerView recycler_view = (RecyclerView) findViewById(R.id.recycler_view);
 
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(ScrollingActivity.this, 2);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(ScrollingActivity.this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
 
@@ -127,3 +135,4 @@ public class MainActivity extends AppCompatActivity implements LoadMoreRecycler.
         getDataAct(batas + "");
     }
 }
+
