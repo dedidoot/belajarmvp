@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import com.mvp.mvp.R;
 
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
@@ -53,8 +52,9 @@ public class ScrollingActivity extends AppCompatActivity implements LoadMoreRecy
 
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(ScrollingActivity.this, 2);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(ScrollingActivity.this);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+      /*  LinearLayoutManager layoutManager = new LinearLayoutManager(ScrollingActivity.this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);*/
 
 
         if (recycler_view != null) {
@@ -69,7 +69,6 @@ public class ScrollingActivity extends AppCompatActivity implements LoadMoreRecy
 
         if (recycler_view != null) {
             recycler_view.setAdapter(adapterUser);
-
         }
 
 
