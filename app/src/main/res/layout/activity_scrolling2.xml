@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff"
-    android:fitsSystemWindows="true"
-    tools:context="com.mvp.mvp.coolapsing.ScrollingActivity">
+    android:background="#fff" >
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:layout_height="wrap_content" >
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
+            android:layout_height="wrap_content"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
@@ -40,26 +35,26 @@
                     android:text="asadasdddddfdsweasdas"
                     android:textColor="#ffff" />
             </LinearLayout>
-           <!-- <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <!-- <RelativeLayout
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content">
 
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/default_cover_profile" />
+                 <ImageView
+                     android:layout_width="match_parent"
+                     android:layout_height="180dp"
+                     android:scaleType="centerCrop"
+                     android:src="@drawable/default_cover_profile" />
 
-                <com.sebangsa.sebangsa.objects.CircleImageView
-                    android:id="@+id/imgLogo"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/default_group"
-                    app:border_color="@color/sb_white"
-                    app:border_width="2dp" />
-            </RelativeLayout>-->
+                 <com.sebangsa.sebangsa.objects.CircleImageView
+                     android:id="@+id/imgLogo"
+                     android:layout_width="60dp"
+                     android:layout_height="60dp"
+                     android:layout_centerInParent="true"
+                     android:layout_gravity="center_vertical"
+                     android:src="@drawable/default_group"
+                     app:border_color="@color/sb_white"
+                     app:border_width="2dp" />
+             </RelativeLayout>-->
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -96,7 +91,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:layout_anchorGravity="bottom|end" />
 
 </android.support.design.widget.CoordinatorLayout>
